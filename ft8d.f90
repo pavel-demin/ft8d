@@ -5,13 +5,16 @@ program ft8d
   include 'ft8_params.f90'
   character infile*80,datetime*13,message*22,msg37*37
   character*22 allmessages(100)
+  character*12 mycall12,hiscall12
+  character*6 mygrid6,hisgrid6
   real s(NH1,NHSYM)
   real sbase(NH1)
-  real candidate(3,100)
-  integer ihdr(11)
-  integer*2 iwave(NMAX)                 !Generated full-length waveform
+  real candidate(3,200)
   real dd(NMAX)
   logical newdat,lsubtract,ldupe,bcontest
+  integer apsym(KK)
+  integer ihdr(11)
+  integer*2 iwave(NMAX)
   integer allsnrs(100)
   save s,dd
 
