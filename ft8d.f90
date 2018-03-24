@@ -20,8 +20,8 @@ program ft8d
 
   nargs=iargc()
   if(nargs.lt.1) then
-     print*,'Usage: ft8d file1 [file2 ...]'
-     go to 999
+    print*,'Usage: ft8d file1 [file2 ...]'
+    go to 999
   endif
   nfiles=nargs
 
@@ -37,70 +37,68 @@ program ft8d
   nfqso=1500
 
   do ifile=1,nfiles
-      call getarg(ifile,infile)
-      open(10,file=infile,status='old',access='stream')
-      read(10,end=999) ihdr,iwave
-      close(10)
-      j2=index(infile,'.wav')
-      read(infile(j2-6:j2-1),*) nutc
-      datetime=infile(j2-13:j2-1)
-      dd=iwave
-      ndecodes=0
-      allmessages='                      '
-      allsnrs=0
-      do ipass=1,3
-        newdat=.true.
-        syncmin=1.5
-        if(ipass.eq.1) then
-          lsubtract=.true.
-          if(ndepth.eq.1) lsubtract=.false.
-        elseif(ipass.eq.2) then
-          n2=ndecodes
-          if(ndecodes.eq.0) cycle
-          lsubtract=.true.
-        elseif(ipass.eq.3) then
-          if((ndecodes-n2).eq.0) cycle
-          lsubtract=.false.
-        endif
-        call sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
-        do icand=1,ncand
-          sync=candidate(3,icand)
-          f1=candidate(1,icand)
-          xdt=candidate(2,icand)
-          xbase=10.0**(0.1*(sbase(nint(f1/3.125))-40.0))
-          nsnr0=min(99,nint(10.0*log10(sync) - 25.5))    !### empirical ###
-          call ft8b(dd,newdat,nQSOProgress,nfqso,nftx,ndepth,lft8apon,       &
-               lapcqonly,napwid,lsubtract,nagain,iaptype,mycall12,mygrid6,   &
-               hiscall12,bcontest,sync,f1,xdt,xbase,apsym,nharderrors,dmin,  &
-               nbadcrc,iappass,iera,msg37,xsnr)
-          message=msg37(1:22)   !###
-          nsnr=nint(xsnr)
-          xdt=xdt-0.5
-          hd=nharderrors+dmin
-          if(nbadcrc.eq.0) then
-  !           call jtmsg(message,iflag)
-             if(bcontest) then
-                call fix_contest_msg(mygrid6,message)
-                msg37(1:22)=message
-             endif
-  !           if(iand(iflag,31).ne.0) message(22:22)='?'
-             ldupe=.false.
-             do id=1,ndecodes
-                if(message.eq.allmessages(id).and.nsnr.le.allsnrs(id)) ldupe=.true.
-             enddo
-             if(.not.ldupe) then
-                ndecodes=ndecodes+1
-                allmessages(ndecodes)=message
-                allsnrs(ndecodes)=nsnr
-             endif
-             write(*,1004) nutc,ncand,icand,ipass,iaptype,iappass,        &
-                  nharderrors,dmin,hd,min(sync,999.0),nint(xsnr),          &
-                  xdt,nint(f1),message
-  1004          format(i6.6,2i4,3i2,i3,3f6.1,i4,f6.2,i5,2x,a22)
+    call getarg(ifile,infile)
+    open(10,file=infile,status='old',access='stream')
+    read(10,end=999) ihdr,iwave
+    close(10)
+    j2=index(infile,'.wav')
+    read(infile(j2-6:j2-1),*) nutc
+    datetime=infile(j2-13:j2-1)
+    dd=iwave
+    ndecodes=0
+    allmessages='                      '
+    allsnrs=0
+    do ipass=1,3
+      newdat=.true.
+      syncmin=1.5
+      if(ipass.eq.1) then
+        lsubtract=.true.
+        if(ndepth.eq.1) lsubtract=.false.
+      elseif(ipass.eq.2) then
+        n2=ndecodes
+        if(ndecodes.eq.0) cycle
+        lsubtract=.true.
+      elseif(ipass.eq.3) then
+        if((ndecodes-n2).eq.0) cycle
+        lsubtract=.false.
+      endif
+      call sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
+      do icand=1,ncand
+        sync=candidate(3,icand)
+        f1=candidate(1,icand)
+        xdt=candidate(2,icand)
+        xbase=10.0**(0.1*(sbase(nint(f1/3.125))-40.0))
+        nsnr0=min(99,nint(10.0*log10(sync) - 25.5)) ! ### empirical ###
+        call ft8b(dd,newdat,nQSOProgress,nfqso,nftx,ndepth,lft8apon,      &
+            lapcqonly,napwid,lsubtract,nagain,iaptype,mycall12,mygrid6,   &
+            hiscall12,bcontest,sync,f1,xdt,xbase,apsym,nharderrors,dmin,  &
+            nbadcrc,iappass,iera,msg37,xsnr)
+        message=msg37(1:22)
+        nsnr=nint(xsnr)
+        xdt=xdt-0.5
+        hd=nharderrors+dmin
+        if(nbadcrc.eq.0) then
+          if(bcontest) then
+            call fix_contest_msg(mygrid6,message)
+            msg37(1:22)=message
           endif
-        enddo
+          ldupe=.false.
+          do id=1,ndecodes
+            if(message.eq.allmessages(id).and.nsnr.le.allsnrs(id)) ldupe=.true.
+          enddo
+          if(.not.ldupe) then
+            ndecodes=ndecodes+1
+            allmessages(ndecodes)=message
+            allsnrs(ndecodes)=nsnr
+          endif
+          write(*,1004) nutc,ncand,icand,ipass,iaptype,iappass,        &
+              nharderrors,dmin,hd,min(sync,999.0),nint(xsnr),          &
+              xdt,nint(f1),message
+1004      format(i6.6,2i4,3i2,i3,3f6.1,i4,f6.2,i5,2x,a22)
+        endif
       enddo
-  enddo   ! ifile loop
+    enddo
+  enddo ! ifile loop
 
 999 end program ft8d
 
