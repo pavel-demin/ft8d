@@ -3,3 +3,7 @@ Minimal set of files required to build the FT8 decoder by Joe Taylor, K1JT.
 The original sources can be found at:
 
   https://sourceforge.net/p/wsjt/wsjt/HEAD/tree/branches/wsjtx/lib/ft8
+
+A brief description of the FT8 protocol can be found at:
+
+  http://physics.princeton.edu/pulsar/k1jt/ft8.txt
