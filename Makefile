@@ -13,8 +13,8 @@ FC = gfortran
 LD = g++
 RM = rm -f
 
-CXXFLAGS = -Wall -fbounds-check
-FFLAGS = -Wall -funroll-loops -fno-second-underscore
+CXXFLAGS = -O3 -Wall -fbounds-check
+FFLAGS = -O3 -Wall -funroll-loops -fno-second-underscore
 LDFLAGS = -lfftw3f `$(FC) -print-file-name=libgfortran.so`
 
 all: $(TARGET)
