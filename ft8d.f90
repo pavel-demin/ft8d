@@ -48,7 +48,9 @@ program ft8d
     ndecodes=0
     allmessages='                      '
     allsnrs=0
-    do ipass=1,3
+    ndepth=1
+    npass=1
+    do ipass=1,npass
       newdat=.true.
       syncmin=1.5
       if(ipass.eq.1) then
