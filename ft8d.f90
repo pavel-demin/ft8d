@@ -1,6 +1,6 @@
 program ft8d
 
-! Decode FT8 data read from *.wav files.
+! Decode FT8 data read from *.c2 files.
 
   include 'ft8_params.f90'
   character infile*80,datetime*13,message*22,msg37*37
@@ -13,8 +13,6 @@ program ft8d
   real dd(NMAX)
   logical newdat,lsubtract,ldupe,bcontest
   integer apsym(KK)
-  integer ihdr(11)
-  integer*2 iwave(NMAX)
   integer allsnrs(100)
   save s,dd
 
@@ -39,12 +37,11 @@ program ft8d
   do ifile=1,nfiles
     call getarg(ifile,infile)
     open(10,file=infile,status='old',access='stream')
-    read(10,end=999) ihdr,iwave
+    read(10,end=999) dd
     close(10)
-    j2=index(infile,'.wav')
+    j2=index(infile,'.c2')
     read(infile(j2-6:j2-1),*) nutc
     datetime=infile(j2-13:j2-1)
-    dd=iwave
     ndecodes=0
     allmessages='                      '
     allsnrs=0
