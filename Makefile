@@ -8,19 +8,19 @@ OBJECTS = \
   indexx.o shell.o pctile.o polyfit.o twkfreq1.o osd174.o encode174.o \
   genft8.o genft8refsig.o subtractft8.o db.o ft8b.o ft8d.o
 
-CXX = g++
+CC = gcc
 FC = gfortran
 LD = g++
 RM = rm -f
 
-CXXFLAGS = -O3 -Wall -fbounds-check -fpermissive
+CFLAGS = -O3 -Wall -fbounds-check
 FFLAGS = -O3 -Wall -funroll-loops -fno-second-underscore
 LDFLAGS = -lfftw3f `$(FC) -print-file-name=libgfortran.so`
 
 all: $(TARGET)
 
-%.o: %.cpp
-	${CXX} -c ${CXXFLAGS} $< -o $@
+%.o: %.c
+	${CC} -c ${CFLAGS} $< -o $@
 %.o: %.f90
 	${FC} -c ${FFLAGS} $< -o $@
 
