@@ -10,7 +10,7 @@ program ft8d
   real s(NH1,NHSYM)
   real sbase(NH1)
   real candidate(3,200)
-  real dd(NMAX)
+  complex dd(NMAX)
   logical newdat,lsubtract,ldupe,bcontest
   integer apsym(KK)
   integer allsnrs(100)

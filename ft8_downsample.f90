@@ -8,7 +8,7 @@ subroutine ft8_downsample(dd,newdat,f0,c1)
   logical newdat
   complex c1(0:NFFT2-1)
   complex cx(0:NFFT1/2)
-  real dd(NMAX),x(NFFT1)
+  complex dd(NMAX),x(NFFT1)
   equivalence (x,cx)
   save cx
 
@@ -16,7 +16,7 @@ subroutine ft8_downsample(dd,newdat,f0,c1)
 ! Data in dd have changed, recompute the long FFT
      x(1:NMAX)=dd
      x(NMAX+1:NFFT1)=0.                       !Zero-pad the x array
-     call four2a(cx,NFFT1,1,-1,0)             !r2c FFT to freq domain
+     call four2a(cx,NFFT1,1,-1,1)             !c2c FFT to freq domain
      newdat=.false.
   endif
 
