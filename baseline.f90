@@ -4,14 +4,15 @@ subroutine baseline(s,nfa,nfb,sbase)
 ! Input:  s(npts)         Linear scale in power
 ! Output: sbase(npts)    Baseline
 
+  include 'ft8_params.f90'
   implicit real*8 (a-h,o-z)
-  real*4 s(1920)
-  real*4 sbase(1920)
+  real*4 s(NSPS)
+  real*4 sbase(NSPS)
   real*4 base
   real*8 x(1000),y(1000),a(5)
   data nseg/10/,npct/10/
 
-  df=12000.0/3840.0                    !3.125 Hz
+  df=12000.0/NFFT1                    !3.125 Hz
   ia=max(1,nint(nfa/df))
   ib=nint(nfb/df)
   do i=ia,ib
