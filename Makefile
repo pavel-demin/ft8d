@@ -10,12 +10,12 @@ OBJECTS = \
 
 CC = gcc
 FC = gfortran
-LD = g++
+LD = gfortran
 RM = rm -f
 
 CFLAGS = -O3 -Wall -fbounds-check
 FFLAGS = -O3 -Wall -funroll-loops -fno-second-underscore
-LDFLAGS = -lfftw3f `$(FC) -print-file-name=libgfortran.so`
+LDFLAGS = -lfftw3f
 
 all: $(TARGET)
 
