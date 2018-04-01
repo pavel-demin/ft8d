@@ -25,14 +25,14 @@ program ft8d
   nfiles=nargs
 
   twopi=8.0*atan(1.0)
-  fs=6000.0                              !Sample rate
+  fs=4000.0                              !Sample rate
   dt=1.0/fs                              !Sample interval (s)
   tt=NSPS*dt                             !Duration of "itone" symbols (s)
   ts=2*NSPS*dt                           !Duration of OQPSK symbols (s)
   baud=1.0/tt                            !Keying rate (baud)
   txt=NZ*dt                              !Transmission length (s)
-  nfa=-2000
-  nfb=+2000
+  nfa=-1600
+  nfb=+1600
   nfqso=0
 
   do ifile=1,nfiles
@@ -62,14 +62,14 @@ program ft8d
         if((ndecodes-n2).eq.0) cycle
         lsubtract=.false.
       endif
-      call sync8(dd,nfa+3000,nfb+3000,syncmin,nfqso+3000,s,candidate,ncand,sbase)
+      call sync8(dd,nfa+2000,nfb+2000,syncmin,nfqso+2000,s,candidate,ncand,sbase)
       do icand=1,ncand
         sync=candidate(3,icand)
         f1=candidate(1,icand)
         xdt=candidate(2,icand)
         xbase=10.0**(0.1*(sbase(nint(f1/3.125))-40.0))
         nsnr0=min(99,nint(10.0*log10(sync) - 25.5)) ! ### empirical ###
-        call ft8b(dd,newdat,nQSOProgress,nfqso+3000,nftx,ndepth,lft8apon,      &
+        call ft8b(dd,newdat,nQSOProgress,nfqso+2000,nftx,ndepth,lft8apon,      &
             lapcqonly,napwid,lsubtract,nagain,iaptype,mycall12,mygrid6,   &
             hiscall12,bcontest,sync,f1,xdt,xbase,apsym,nharderrors,dmin,  &
             nbadcrc,iappass,iera,msg37,xsnr)
@@ -93,7 +93,7 @@ program ft8d
           endif
           write(*,1004) nutc,ipass,iaptype,iappass,        &
               nharderrors,dmin,hd,min(sync,999.0),nint(xsnr),          &
-              xdt,nint(f1-3000+dialfreq),message
+              xdt,nint(f1-2000+dialfreq),message
 1004      format(i6.6,3i2,i3,3f6.1,i4,f6.2,i9,1x,a22)
         endif
       enddo

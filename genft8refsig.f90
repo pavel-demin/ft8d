@@ -1,18 +1,18 @@
 subroutine genft8refsig(itone,cref,f0)
-  complex cref(79*960)
+  complex cref(79*640)
   integer itone(79)
   real*8 twopi,phi,dphi,dt,xnsps
   data twopi/0.d0/
   save twopi
   if( twopi .lt. 0.1 ) twopi=8.d0*atan(1.d0)
 
-  xnsps=960.d0
-  dt=1.d0/6000.d0
+  xnsps=640.d0
+  dt=1.d0/4000.d0
   phi=0.d0
   k=1
   do i=1,79
     dphi=twopi*(f0*dt+itone(i)/xnsps)
-    do is=1,960
+    do is=1,640
       cref(k)=cmplx(cos(phi),sin(phi))
       phi=mod(phi+dphi,twopi)
       k=k+1

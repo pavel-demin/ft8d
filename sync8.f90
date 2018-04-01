@@ -22,8 +22,8 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
 
 ! Compute symbol spectra, stepping by NSTEP steps.
   savg=0.
-  tstep=NSTEP/6000.0
-  df=6000.0/NFFT1                             !3.125 Hz
+  tstep=NSTEP/4000.0
+  df=4000.0/NFFT1                             !3.125 Hz
   fac=1.0/300.0
   do j=1,NHSYM
      ia=(j-1)*NSTEP + 1

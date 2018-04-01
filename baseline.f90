@@ -12,7 +12,7 @@ subroutine baseline(s,nfa,nfb,sbase)
   real*8 x(1000),y(1000),a(5)
   data nseg/10/,npct/10/
 
-  df=6000.0/NFFT1                     !3.125 Hz
+  df=4000.0/NFFT1                     !3.125 Hz
   ia=max(1,nint(nfa/df))
   ib=nint(nfb/df)
   do i=ia,ib
