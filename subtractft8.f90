@@ -11,7 +11,8 @@ subroutine subtractft8(dd,itone,f0,dt)
 
   parameter (NMAX=15*12000,NFRAME=1920*79)
   parameter (NFFT=NMAX,NFILT=1400)
-  real*4  dd(NMAX), window(-NFILT/2:NFILT/2)
+  real*4 window(-NFILT/2:NFILT/2)
+  complex dd(NMAX)
   complex cref,camp,cfilt,cw
   integer itone(79)
   logical first
@@ -53,7 +54,7 @@ subroutine subtractft8(dd,itone,f0,dt)
 ! Subtract the reconstructed signal
   do i=1,nframe
      j=nstart+i-1
-     if(j.ge.1 .and. j.le.NMAX) dd(j)=dd(j)-2*REAL(cfilt(i)*cref(i))
+     if(j.ge.1 .and. j.le.NMAX) dd(j)=dd(j)-cfilt(i)*cref(i)
   enddo
 
   return
