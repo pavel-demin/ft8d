@@ -91,10 +91,10 @@ program ft8d
             allmessages(ndecodes)=message
             allsnrs(ndecodes)=nsnr
           endif
-          write(*,1004) nutc,ncand,icand,ipass,iaptype,iappass,        &
+          write(*,1004) nutc,ipass,iaptype,iappass,        &
               nharderrors,dmin,hd,min(sync,999.0),nint(xsnr),          &
               xdt,nint(f1-3000+dialfreq),message
-1004      format(i6.6,2i4,3i2,i3,3f6.1,i4,f6.2,i5,2x,a22)
+1004      format(i6.6,3i2,i3,3f6.1,i4,f6.2,i9,1x,a22)
         endif
       enddo
     enddo
