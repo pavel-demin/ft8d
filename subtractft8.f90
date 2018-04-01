@@ -20,8 +20,13 @@ subroutine subtractft8(dd,itone,f0,dt)
   common/heap8/cref(NFRAME),camp(NMAX),cfilt(NMAX),cw(NMAX)
   save first
 
+  if(f0.lt.3000.0) then
+    f=f0+3000.0
+  else
+    f=f0-3000.0
+  endif
   nstart=dt*6000+1
-  call genft8refsig(itone,cref,f0)
+  call genft8refsig(itone,cref,f)
   camp=0.
   do i=1,nframe
     id=nstart-1+i
