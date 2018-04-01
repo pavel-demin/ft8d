@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 static unsigned short table[256] =
 {
     0x0000, 0x1c06, 0x340a, 0x280c, 0x6814, 0x7412, 0x5c1e, 0x4018,
@@ -51,7 +53,7 @@ short crc12(unsigned char const *data, int length)
     return remainder & 0x0fff;
 }
 
-short crc12_check(unsigned char const *data, int length)
+bool crc12_check(unsigned char const *data, int length)
 {
     return !crc12(data, length);
 }
