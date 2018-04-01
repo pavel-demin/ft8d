@@ -9,7 +9,7 @@ subroutine subtractft8(dd,itone,f0,dt)
 
   use timer_module, only: timer
 
-  parameter (NMAX=15*12000,NFRAME=1920*79)
+  parameter (NMAX=15*6000,NFRAME=960*79)
   parameter (NFFT=NMAX,NFILT=1400)
   real*4 window(-NFILT/2:NFILT/2)
   complex dd(NMAX)
@@ -20,7 +20,7 @@ subroutine subtractft8(dd,itone,f0,dt)
   common/heap8/cref(NFRAME),camp(NMAX),cfilt(NMAX),cw(NMAX)
   save first
 
-  nstart=dt*12000+1
+  nstart=dt*6000+1
   call genft8refsig(itone,cref,f0)
   camp=0.
   do i=1,nframe

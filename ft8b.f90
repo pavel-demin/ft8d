@@ -76,7 +76,7 @@ subroutine ft8b(dd0,newdat,nQSOProgress,nfqso,nftx,ndepth,lapon,lapcqonly,   &
 
   max_iterations=30
   nharderrors=-1
-  fs2=12000.0/NDOWN
+  fs2=6000.0/NDOWN
   dt2=1.0/fs2
   twopi=8.0*atan(1.0)
   delfbest=0.

@@ -3,18 +3,18 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
   include 'ft8_params.f90'
 ! Search over +/- 2.5s relative to 0.5s TX start time.
   parameter (JZ=62)
-  complex cx(0:NH1)
-  real s(NH1,NHSYM)
-  real savg(NH1)
-  real sbase(NH1)
+  complex cx(0:NFFT1-1)
+  real s(NFFT1,NHSYM)
+  real savg(NFFT1)
+  real sbase(NFFT1)
   complex x(NFFT1)
-  real sync2d(NH1,-JZ:JZ)
-  real red(NH1)
+  real sync2d(NFFT1,-JZ:JZ)
+  real red(NFFT1)
   real candidate0(3,200)
   real candidate(3,200)
   complex dd(NMAX)
-  integer jpeak(NH1)
-  integer indx(NH1)
+  integer jpeak(NFFT1)
+  integer indx(NFFT1)
   integer ii(1)
   integer icos7(0:6)
   data icos7/2,5,6,0,4,1,3/                   !Costas 7x7 tone pattern
@@ -22,8 +22,8 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
 
 ! Compute symbol spectra, stepping by NSTEP steps.
   savg=0.
-  tstep=NSTEP/12000.0
-  df=12000.0/NFFT1                            !3.125 Hz
+  tstep=NSTEP/6000.0
+  df=6000.0/NFFT1                             !3.125 Hz
   fac=1.0/300.0
   do j=1,NHSYM
      ia=(j-1)*NSTEP + 1
@@ -32,9 +32,10 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
      x(NSPS+1:)=0.
      call four2a(x,NFFT1,1,-1,1)              !c2c FFT
      do i=1,NH1
-        s(i,j)=real(cx(i))**2 + aimag(cx(i))**2
+        s(i,j)=real(cx(i+NH1))**2 + aimag(cx(i+NH1))**2
+        s(i+NH1,j)=real(cx(i))**2 + aimag(cx(i))**2
      enddo
-     savg=savg + s(1:NH1,j)                   !Average spectrum
+     savg=savg + s(1:NFFT1,j)                 !Average spectrum
   enddo
   call baseline(savg,nfa,nfb,sbase)
 !  savg=savg/NHSYM
