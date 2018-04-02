@@ -15,7 +15,6 @@ program ft8d
   logical newdat,lsubtract,ldupe,bcontest
   integer apsym(KK)
   integer allsnrs(100)
-  save s,dd
 
   nargs=iargc()
   if(nargs.lt.1) then
@@ -69,7 +68,7 @@ program ft8d
         xdt=candidate(2,icand)
         xbase=10.0**(0.1*(sbase(nint(f1/3.125))-40.0))
         nsnr0=min(99,nint(10.0*log10(sync) - 25.5)) ! ### empirical ###
-        call ft8b(dd,newdat,nQSOProgress,nfqso+2000,nftx,ndepth,lft8apon,      &
+        call ft8b(dd,newdat,nQSOProgress,nfqso+2000,nftx,ndepth,lft8apon, &
             lapcqonly,napwid,lsubtract,nagain,iaptype,mycall12,mygrid6,   &
             hiscall12,bcontest,sync,f1,xdt,xbase,apsym,nharderrors,dmin,  &
             nbadcrc,iappass,iera,msg37,xsnr)
@@ -91,8 +90,8 @@ program ft8d
             allmessages(ndecodes)=message
             allsnrs(ndecodes)=nsnr
           endif
-          write(*,1004) nutc,ipass,iaptype,iappass,        &
-              nharderrors,dmin,hd,min(sync,999.0),nint(xsnr),          &
+          write(*,1004) nutc,ipass,iaptype,iappass,           &
+              nharderrors,dmin,hd,min(sync,999.0),nint(xsnr), &
               xdt,nint(f1-2000+dialfreq),message
 1004      format(i6.6,3i2,i3,3f6.1,i4,f6.2,i9,1x,a22)
         endif
