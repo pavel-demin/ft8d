@@ -11,17 +11,16 @@ program ft8d
   real sbase(NFFT1)
   real candidate(3,200)
   real*8 dialfreq
-  complex dd(NMAX)
+  complex dd(NMAX,4)
   logical newdat,lsubtract,ldupe,bcontest
   integer apsym(KK)
   integer allsnrs(100)
 
   nargs=iargc()
-  if(nargs.lt.1) then
-    print*,'Usage: ft8d file1 [file2 ...]'
+  if(nargs.ne.1) then
+    print*,'Usage: ft8d file'
     go to 999
   endif
-  nfiles=nargs
 
   twopi=8.0*atan(1.0)
   fs=4000.0                              !Sample rate
@@ -34,14 +33,14 @@ program ft8d
   nfb=+1600
   nfqso=0
 
-  do ifile=1,nfiles
-    call getarg(ifile,infile)
-    open(10,file=infile,status='old',access='stream')
-    read(10,end=999) dialfreq,dd
-    close(10)
-    j2=index(infile,'.c2')
-    read(infile(j2-6:j2-1),*) nutc
-    datetime=infile(j2-13:j2-1)
+  call getarg(1,infile)
+  open(10,file=infile,status='old',access='stream')
+  read(10,end=999) dialfreq,dd
+  close(10)
+  j2=index(infile,'.c2')
+  read(infile(j2-6:j2-1),*) nutc
+  datetime=infile(j2-13:j2-1)
+  do ipart=1,4
     ndecodes=0
     allmessages='                      '
     allsnrs=0
@@ -61,17 +60,17 @@ program ft8d
         if((ndecodes-n2).eq.0) cycle
         lsubtract=.false.
       endif
-      call sync8(dd,nfa+2000,nfb+2000,syncmin,nfqso+2000,s,candidate,ncand,sbase)
+      call sync8(dd(1:NMAX,ipart),nfa+2000,nfb+2000,syncmin, &
+          nfqso+2000,s,candidate,ncand,sbase)
       do icand=1,ncand
         sync=candidate(3,icand)
         f1=candidate(1,icand)
         xdt=candidate(2,icand)
         xbase=10.0**(0.1*(sbase(nint(f1/3.125))-40.0))
-        nsnr0=min(99,nint(10.0*log10(sync) - 25.5)) ! ### empirical ###
-        call ft8b(dd,newdat,nQSOProgress,nfqso+2000,nftx,ndepth,lft8apon, &
-            lapcqonly,napwid,lsubtract,nagain,iaptype,mycall12,mygrid6,   &
-            hiscall12,bcontest,sync,f1,xdt,xbase,apsym,nharderrors,dmin,  &
-            nbadcrc,iappass,iera,msg37,xsnr)
+        call ft8b(dd(1:NMAX,ipart),newdat,nQSOProgress,nfqso+2000,   &
+            nftx,ndepth,lft8apon, lapcqonly,napwid,lsubtract,nagain, &
+            iaptype,mycall12,mygrid6,hiscall12,bcontest,sync,f1,xdt, &
+            xbase,apsym,nharderrors,dmin,nbadcrc,iappass,iera,msg37,xsnr)
         message=msg37(1:22)
         nsnr=nint(xsnr)
         xdt=xdt-0.5
@@ -90,14 +89,14 @@ program ft8d
             allmessages(ndecodes)=message
             allsnrs(ndecodes)=nsnr
           endif
-          write(*,1004) nutc,ipass,iaptype,iappass,           &
-              nharderrors,dmin,hd,min(sync,999.0),nint(xsnr), &
+          write(*,1004) nutc+15*(ipart-1),ipass,iaptype,iappass, &
+              nharderrors,dmin,hd,min(sync,999.0),nint(xsnr),    &
               xdt,nint(f1-2000+dialfreq),message
 1004      format(i6.6,3i2,i3,3f6.1,i4,f6.2,i9,1x,a22)
         endif
       enddo
     enddo
-  enddo ! ifile loop
+  enddo ! ipart loop
 
 999 end program ft8d
 
