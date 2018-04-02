@@ -3,7 +3,7 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
   include 'ft8_params.f90'
 ! Search over +/- 2.5s relative to 0.5s TX start time.
   parameter (JZ=62)
-  complex cx(0:NFFT1-1)
+  complex cx(0:NFFT1)
   real s(NFFT1,NHSYM)
   real savg(NFFT1)
   real sbase(NFFT1)
