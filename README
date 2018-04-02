@@ -7,3 +7,9 @@ The original sources can be found at:
 A brief description of the FT8 protocol can be found at:
 
   http://physics.princeton.edu/pulsar/k1jt/ft8.txt
+
+Changes from the original sources:
+  - ft8d.f90 is updated and working
+  - crc10.cpp and crc12.cpp are replaced with crc10.c and crc12.c
+  - hardcoded values are replaced with parameters in baseline.f90 and ft8b.f90
+  - input format is changed to complex samples at 4000 samples per second
