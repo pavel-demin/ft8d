@@ -10,7 +10,7 @@ subroutine subtractft8(dd,itone,f0,dt)
   use timer_module, only: timer
 
   parameter (NMAX=15*4000,NFRAME=640*79)
-  parameter (NFFT=NMAX,NFILT=1400)
+  parameter (NFFT=NMAX,NFILT=700)
   real*4 window(-NFILT/2:NFILT/2)
   complex dd(NMAX)
   complex cref,camp,cfilt,cw
