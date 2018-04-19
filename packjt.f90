@@ -170,13 +170,12 @@ module packjt
    return
  end subroutine unpackcall
 
- subroutine unpackmsg(dat,lhasgrid,msgcall,msggrid)
+ subroutine unpackmsg(dat,msgcall,msggrid)
 
    parameter (NBASE=37*36*10*27*27*27)
    parameter (NGBASE=180*180)
    integer dat(:)
    character msgcall*12,msggrid*4,grid6*6,junk2*4
-   logical lhasgrid
 
    nc1=ishft(dat(1),22) + ishft(dat(2),16) + ishft(dat(3),10)+         &
         ishft(dat(4),4) + iand(ishft(dat(5),-2),15)
@@ -187,15 +186,13 @@ module packjt
 
    ng=ishft(iand(dat(10),15),12) + ishft(dat(11),6) + dat(12)
 
-   lhasgrid=.false.
+   call unpackcall(nc2,msgcall,junk1,junk2)
    msggrid='    '
    if(ng.lt.32400 .and. ng.ne.533) then
-      call unpackcall(nc2,msgcall,junk1,junk2)
       dlat=mod(ng,180)-90
       dlong=(ng/180)*2 - 180 + 2
       call deg2grid(dlong,dlat,grid6)
       msggrid=grid6(:4)
-      lhasgrid=msggrid(1:2).ne.'KA' .and. msggrid(1:2).ne.'KA'
    endif
 
    return

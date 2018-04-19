@@ -10,7 +10,7 @@ program ft8d
   real candidate(3,200)
   real*8 dialfreq
   complex dd(NMAX,4)
-  logical newdat,lhasgrid
+  logical newdat
   integer apsym(KK)
 
   nargs=iargc()
@@ -52,15 +52,15 @@ program ft8d
       call ft8b(dd(1:NMAX,ipart),newdat,nQSOProgress,nfqso+2000, &
           nftx,ndepth,lft8apon,lapcqonly,napwid,nagain,iaptype,  &
           f1,xdt,xbase,apsym,nharderrors,dmin,nbadcrc,iappass,   &
-          lhasgrid,msgcall,msggrid,xsnr)
+          msgcall,msggrid,xsnr)
       message=msg37(1:22)
       nsnr=nint(xsnr)
       xdt=xdt-0.5
       hd=nharderrors+dmin
-      if(nbadcrc.eq.0 .and. lhasgrid) then
+      if(nbadcrc.eq.0) then
         write(*,1004) nutc+15*(ipart-1),min(sync,999.0),nint(xsnr), &
-            xdt,nint(f1-2000+dialfreq),msggrid,msgcall
-1004      format(i6.6,f6.1,i4,f6.2,i9,1x,a4,1x,a12)
+            xdt,nint(f1-2000+dialfreq),msgcall,msggrid
+1004      format(i6.6,f6.1,i4,f6.2,i9,1x,a12,1x,a4)
       endif
     enddo
   enddo ! ipart loop

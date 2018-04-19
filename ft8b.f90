@@ -1,6 +1,6 @@
 subroutine ft8b(dd0,newdat,nQSOProgress,nfqso,nftx,ndepth,lapon,lapcqonly, &
       napwid,nagain,iaptype,f1,xdt,xbase,apsym,nharderrors,dmin,      &
-      nbadcrc,ipass,lhasgrid,msgcall,msggrid,xsnr)
+      nbadcrc,ipass,msgcall,msggrid,xsnr)
 
   use crc
   include 'ft8_params.f90'
@@ -23,7 +23,7 @@ subroutine ft8b(dd0,newdat,nQSOProgress,nfqso,nftx,ndepth,lapon,lapcqonly, &
   complex cd0(3200)
   complex ctwk(32)
   complex csymb(32)
-  logical first,newdat,lapon,lapcqonly,nagain,lhasgrid
+  logical first,newdat,lapon,lapcqonly,nagain
   equivalence (s1,s1sort)
   data icos7/2,5,6,0,4,1,3/
   data mcq/1,1,1,1,1,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,1,1,0,0,1/
@@ -360,7 +360,7 @@ subroutine ft8b(dd0,newdat,nQSOProgress,nfqso,nftx,ndepth,lapon,lapcqonly, &
         cycle
      endif
      if(nbadcrc.eq.0) then
-        call extractmessage174(decoded,lhasgrid,msgcall,msggrid,ncrcflag)
+        call extractmessage174(decoded,msgcall,msggrid,ncrcflag)
         xsig=0.0
         xnoi=0.0
         do i=1,79

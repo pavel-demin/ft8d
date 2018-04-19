@@ -1,4 +1,4 @@
-subroutine extractmessage174(decoded,lhasgrid,msgcall,msggrid,ncrcflag)
+subroutine extractmessage174(decoded,msgcall,msggrid,ncrcflag)
   use iso_c_binding, only: c_loc,c_size_t
   use crc
   use packjt
@@ -8,7 +8,6 @@ subroutine extractmessage174(decoded,lhasgrid,msgcall,msggrid,ncrcflag)
   integer*1 decoded(87)
   integer*1, target::  i1Dec8BitBytes(11)
   integer*4 i4Dec6BitWords(12)
-  logical lhasgrid
 
 ! Write decoded bits into cbits: 75-bit message plus 12-bit CRC
   write(cbits,1000) decoded
@@ -31,7 +30,7 @@ subroutine extractmessage174(decoded,lhasgrid,msgcall,msggrid,ncrcflag)
       enddo
       i4Dec6BitWords(ibyte)=itmp
     enddo
-    call unpackmsg(i4Dec6BitWords,lhasgrid,msgcall,msggrid)
+    call unpackmsg(i4Dec6BitWords,msgcall,msggrid)
     ncrcflag=1
   else
     msgcall=' '
