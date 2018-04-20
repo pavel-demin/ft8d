@@ -1,33 +1,6 @@
 module packjt
 
-! These variables are accessible from outside via "use packjt":
-  integer jt_itype,jt_nc1,jt_nc2,jt_ng,jt_k1,jt_k2
-  character*6 jt_c1,jt_c2,jt_c3
-
   contains
-
- subroutine unpackbits(sym,nsymd,m0,dbits)
-
- ! Unpack bits from sym() into dbits(), one bit per byte.
- ! NB: nsymd is the number of input words, and m0 their length.
- ! there will be m0*nsymd output bytes, each 0 or 1.
-
-   integer sym(:)
-   integer*1 dbits(:)
-
-   k=0
-   do i=1,nsymd
-      mask=ishft(1,m0-1)
-      do j=1,m0
-         k=k+1
-         dbits(k)=0
-         if(iand(mask,sym(i)).ne.0) dbits(k)=1
-         mask=ishft(mask,-1)
-      enddo
-   enddo
-
-   return
- end subroutine unpackbits
 
  subroutine unpackcall(ncall,word,iv2,psfx)
 
