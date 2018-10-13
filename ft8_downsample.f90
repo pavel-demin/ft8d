@@ -16,21 +16,17 @@ subroutine ft8_downsample(dd,newdat,f0,c1)
 ! Data in dd have changed, recompute the long FFT
      x(1:NMAX)=dd
      x(NMAX+1:NFFT1)=0.                       !Zero-pad the x array
-     call four2a(cx,NFFT1,1,-1,1)             !c2c FFT to freq domain
+     call four2a(x,NFFT1,1,-1,1)              !c2c FFT to freq domain
+     x=cshift(x,NFFT1/2)
      newdat=.false.
   endif
 
-  if(f0.lt.2000.0) then
-    f=f0+2000.0
-  else
-    f=f0-2000.0
-  endif
   df=4000.0/NFFT1
   baud=4000.0/NSPS
-  i0=nint(f/df)
-  ft=f+8.0*baud
+  i0=nint(f0/df)
+  ft=f0+8.0*baud
   it=min(nint(ft/df),NFFT1)
-  fb=f-1.0*baud
+  fb=f0-1.0*baud
   ib=max(1,nint(fb/df))
   k=0
   c1=0.

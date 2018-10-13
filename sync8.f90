@@ -3,7 +3,7 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
   include 'ft8_params.f90'
 ! Search over +/- 2.5s relative to 0.5s TX start time.
   parameter (JZ=62)
-  complex cx(NFFT1)
+  complex cx(0:NFFT1)
   real s(NFFT1,NHSYM)
   real savg(NFFT1)
   real sbase(NFFT1)
@@ -19,6 +19,7 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
   integer icos7(0:6)
   data icos7/2,5,6,0,4,1,3/                   !Costas 7x7 tone pattern
   equivalence (x,cx)
+  save cx
 
 ! Compute symbol spectra, stepping by NSTEP steps.
   savg=0.
@@ -31,11 +32,10 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
      x(1:NSPS)=fac*dd(ia:ib)
      x(NSPS+1:)=0.
      call four2a(x,NFFT1,1,-1,1)              !c2c FFT
-     do i=2,NH1
-        s(i-1,j)=real(cx(i+NH1))**2 + aimag(cx(i+NH1))**2
-        s(i-1+NH1,j)=real(cx(i))**2 + aimag(cx(i))**2
+     x=cshift(x,NFFT1/2)
+     do i=1,NFFT1
+        s(i,j)=real(cx(i))**2 + aimag(cx(i))**2
      enddo
-     s(NH1,j)=real(cx(1))**2 + aimag(cx(1))**2
      savg=savg + s(1:NFFT1,j)                 !Average spectrum
   enddo
   call baseline(savg,nfa,nfb,sbase)
