@@ -40,7 +40,7 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
   enddo
   call baseline(savg,nfa,nfb,sbase)
 !  savg=savg/NHSYM
-!  do i=1,NH1
+!  do i=1,NFFT1
 !     write(51,3051) i*df,savg(i),db(savg(i))
 !3051 format(f10.3,e12.3,f12.3)
 !  enddo
