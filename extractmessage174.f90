@@ -1,9 +1,9 @@
-subroutine extractmessage174(decoded,msgcall,msggrid,ncrcflag)
+subroutine extractmessage174(decoded,msgreceived,msgcall,msggrid,ncrcflag)
   use iso_c_binding, only: c_loc,c_size_t
   use crc
   use packjt
 
-  character msgcall*12, msggrid*4
+  character msgreceived*22, msgcall*12, msggrid*4
   character*87 cbits
   integer*1 decoded(87)
   integer*1, target::  i1Dec8BitBytes(11)
@@ -30,9 +30,10 @@ subroutine extractmessage174(decoded,msgcall,msggrid,ncrcflag)
       enddo
       i4Dec6BitWords(ibyte)=itmp
     enddo
-    call unpackmsg(i4Dec6BitWords,msgcall,msggrid)
+    call unpackmsg(i4Dec6BitWords,msgreceived,msgcall,msggrid)
     ncrcflag=1
   else
+    msgreceived=' '
     msgcall=' '
     msggrid=' '
     ncrcflag=-1

@@ -360,7 +360,8 @@ subroutine ft8b(dd0,newdat,nQSOProgress,nfqso,nftx,ndepth,lapon,lapcqonly, &
         cycle
      endif
      if(nbadcrc.eq.0) then
-        call extractmessage174(decoded,msgcall,msggrid,ncrcflag)
+        call extractmessage174(decoded,message,msgcall,msggrid,ncrcflag)
+        call genft8(message,0,itone)
         xsig=0.0
         xnoi=0.0
         do i=1,79
