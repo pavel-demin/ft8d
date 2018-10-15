@@ -5,10 +5,8 @@ subroutine genft8(msg,i3bit,itone)
   use crc
   use packjt
   include 'ft8_params.f90'
-  character*22 msg,msgsent
-  character*6 mygrid
+  character*22 msg
   character*87 cbits
-  logical bcontest,checksumok
   integer*4 i4Msg6BitWords(12)                !72-bit message as 6-bit words
   integer*1 msgbits(KK),codeword(3*ND)
   integer*1, target:: i1Msg8BitBytes(11)
@@ -25,12 +23,6 @@ subroutine genft8(msg,i3bit,itone)
   i1Msg8BitBytes(10)=iand(i1Msg8BitBytes(10),128+64+32)
   i1Msg8BitBytes(11)=0
   icrc12=crc12(c_loc(i1Msg8BitBytes),11)
-
-! For reference, here's how to check the CRC
-!  i1Msg8BitBytes(10)=icrc12/256
-!  i1Msg8BitBytes(11)=iand (icrc12,255)
-!  checksumok = crc12_check(c_loc (i1Msg8BitBytes), 11)
-!  if( checksumok ) write(*,*) 'Good checksum'
 
   write(cbits,1003) i4Msg6BitWords,i3bit,icrc12
 1003 format(12b6.6,b3.3,b12.12)
