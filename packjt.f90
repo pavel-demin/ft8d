@@ -526,6 +526,7 @@ subroutine packcall(callsign,ncall,text)
    endif
 
    call unpackcall(nc2,c2,junk1,junk2)
+   msgcall=c2
    msggrid='    '
    if(ng.lt.32400 .and. ng.ne.533) then
       dlat=mod(ng,180)-90
