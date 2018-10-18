@@ -3,7 +3,7 @@ program ft8d
 ! Decode FT8 data read from *.c2 files.
 
   include 'ft8_params.f90'
-  character infile*80,date*6,message*22,msg37*37
+  character infile*80,date*6
   character msgcall*12, msggrid*4
   real s(NFFT1,NHSYM)
   real sbase(NFFT1)
@@ -53,7 +53,6 @@ program ft8d
           nftx,ndepth,lft8apon,lapcqonly,napwid,nagain,iaptype,  &
           f1,xdt,xbase,apsym,nharderrors,dmin,nbadcrc,iappass,   &
           msgcall,msggrid,xsnr)
-      message=msg37(1:22)
       nsnr=nint(xsnr)
       xdt=xdt-0.5
       hd=nharderrors+dmin
