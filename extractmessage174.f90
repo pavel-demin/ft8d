@@ -3,7 +3,7 @@ subroutine extractmessage174(decoded,msgreceived,msgcall,msggrid,ncrcflag)
   use crc
   use packjt
 
-  character msgreceived*22, msgcall*12, msggrid*4
+  character msgreceived*22, msgcall*6, msggrid*4
   character*87 cbits
   integer*1 decoded(87)
   integer*1, target::  i1Dec8BitBytes(11)

@@ -4,7 +4,7 @@ program ft8d
 
   include 'ft8_params.f90'
   character infile*80,date*6
-  character msgcall*12, msggrid*4
+  character msgcall*6,msggrid*4
   real s(NFFT1,NHSYM)
   real sbase(NFFT1)
   real candidate(3,200)
@@ -59,7 +59,7 @@ program ft8d
       if(nbadcrc.eq.0) then
         write(*,1004) date,nutc+15*(ipart-1),min(sync,999.0),nint(xsnr), &
             xdt,nint(f1-2000+dialfreq),msgcall,msggrid
-1004      format(a6,1x,i6,f6.1,i4,f6.2,i9,1x,a12,1x,a4)
+1004      format(a6,1x,i6,f6.1,i4,f6.2,i9,1x,a6,1x,a4)
       endif
     enddo
   enddo ! ipart loop

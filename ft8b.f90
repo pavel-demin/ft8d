@@ -5,7 +5,7 @@ subroutine ft8b(dd0,newdat,nQSOProgress,nfqso,nftx,ndepth,lapon,lapcqonly, &
   use crc
   include 'ft8_params.f90'
   parameter(NP2=2812)
-  character msgcall*12,msggrid*4,message*22
+  character msgcall*6,msggrid*4,message*22
   real a(5)
   real s1(0:7,ND),s2(0:7,NN),s1sort(8*ND)
   real ps(0:7),psl(0:7)

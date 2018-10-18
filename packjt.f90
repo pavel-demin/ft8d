@@ -494,7 +494,7 @@ subroutine packcall(callsign,ncall,text)
    parameter (NBASE=37*36*10*27*27*27)
    parameter (NGBASE=180*180)
    integer dat(:)
-   character c1*12,c2*12,grid*4,msg*22,msgcall*12,msggrid*4,grid6*6,psfx*4,junk2*4
+   character c1*12,c2*12,grid*4,msg*22,msgcall*6,msggrid*4,grid6*6,psfx*4,junk2*4
    logical cqnnn
 
    cqnnn=.false.
@@ -526,7 +526,7 @@ subroutine packcall(callsign,ncall,text)
    endif
 
    call unpackcall(nc2,c2,junk1,junk2)
-   msgcall=c2
+   msgcall=c2(:6)
    msggrid='    '
    if(ng.lt.32400 .and. ng.ne.533) then
       dlat=mod(ng,180)-90
