@@ -35,8 +35,8 @@ program ft8d
   read(10,end=999) dialfreq,dd
   close(10)
   j2=index(infile,'.c2')
-  date=infile(j2-13:j2-8)
-  time=infile(j2-6:j2-3)
+  date=infile(j2-11:j2-6)
+  time=infile(j2-4:j2-1)
   do ipart=1,4
     ndecodes=0
     ndepth=1
