@@ -5,13 +5,22 @@ subroutine ft8_downsample(dd,newdat,f0,c1)
   parameter (NMAX=15*4000,NSPS=640)
   parameter (NFFT1=64000,NFFT2=3200)       !64000/20 = 3200
 
-  logical newdat
+  logical newdat,first
   complex c1(0:NFFT2-1)
   complex cx(0:NFFT1)
   complex dd(NMAX),x(NFFT1)
+  real taper(0:100)
   equivalence (x,cx)
-  save cx
+  data first/.true./
+  save cx,first,taper
 
+  if(first) then
+     pi=4.0*atan(1.0)
+     do i=0,100
+       taper(i)=0.5*(1.0+cos(i*pi/100))
+     enddo
+     first=.false.
+  endif
   if(newdat) then
 ! Data in dd have changed, recompute the long FFT
      x(1:NMAX)=dd
@@ -24,9 +33,9 @@ subroutine ft8_downsample(dd,newdat,f0,c1)
   df=4000.0/NFFT1
   baud=4000.0/NSPS
   i0=nint(f0/df)
-  ft=f0+8.0*baud
+  ft=f0+8.5*baud
   it=min(nint(ft/df),NFFT1)
-  fb=f0-1.0*baud
+  fb=f0-1.5*baud
   ib=max(1,nint(fb/df))
   k=0
   c1=0.
@@ -34,6 +43,8 @@ subroutine ft8_downsample(dd,newdat,f0,c1)
    c1(k)=cx(i)
    k=k+1
   enddo
+  c1(0:100)=c1(0:100)*taper(100:0:-1)
+  c1(k-1-100:k-1)=c1(k-1-100:k-1)*taper
   c1=cshift(c1,i0-ib)
   call four2a(c1,NFFT2,1,1,1)            !c2c FFT back to time domain
   fac=1.0/sqrt(float(NFFT1)*NFFT2)
