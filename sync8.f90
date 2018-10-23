@@ -1,4 +1,4 @@
-subroutine sync8(dd,nfa,nfb,syncmin,nfqso,maxcand,s,candidate,ncand,sbase)
+subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
 
   include 'ft8_params.f90'
 ! Search over +/- 2.5s relative to 0.5s TX start time.
@@ -10,8 +10,8 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,maxcand,s,candidate,ncand,sbase)
   complex x(NFFT1)
   real sync2d(NFFT1,-JZ:JZ)
   real red(NFFT1)
-  real candidate0(3,maxcand)
-  real candidate(3,maxcand)
+  real candidate0(3,MAXCAND)
+  real candidate(3,MAXCAND)
   complex dd(NMAX)
   integer jpeak(NFFT1)
   integer indx(NFFT1)
@@ -103,9 +103,9 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,maxcand,s,candidate,ncand,sbase)
 
   candidate0=0.
   k=0
-  do i=1,maxcand
+  do i=1,MAXCAND
      n=ia + indx(iz+1-i) - 1
-     if(red(n).lt.syncmin.or.isnan(red(n)).or.k.eq.maxcand) exit
+     if(red(n).lt.syncmin.or.isnan(red(n)).or.k.eq.MAXCAND) exit
      k=k+1
      candidate0(1,k)=n*df
      candidate0(2,k)=(jpeak(n)-1)*tstep
