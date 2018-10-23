@@ -43,7 +43,7 @@ program ft8d
     newdat=.true.
     syncmin=1.5
     call sync8(dd(1:NMAX,ipart),nfa+2000,nfb+2000,syncmin, &
-        nfqso+2000,s,candidate,ncand,sbase)
+        nfqso+2000,200,s,candidate,ncand,sbase)
     do icand=1,ncand
       sync=candidate(3,icand)
       f1=candidate(1,icand)
