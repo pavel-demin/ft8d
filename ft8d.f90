@@ -7,7 +7,7 @@ program ft8d
   character msgcall*6,msggrid*4
   real s(NFFT1,NHSYM)
   real sbase(NFFT1)
-  real candidate(3,200)
+  real candidate(3,MAXCAND)
   real*8 dialfreq
   complex dd(NMAX,4)
   logical newdat
@@ -43,7 +43,7 @@ program ft8d
     newdat=.true.
     syncmin=1.5
     call sync8(dd(1:NMAX,ipart),nfa+2000,nfb+2000,syncmin, &
-        nfqso+2000,200,s,candidate,ncand,sbase)
+        nfqso+2000,MAXCAND,s,candidate,ncand,sbase)
     do icand=1,ncand
       sync=candidate(3,icand)
       f1=candidate(1,icand)

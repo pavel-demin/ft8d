@@ -10,3 +10,4 @@ parameter (NFFT1=2*NSPS)              !Length of FFTs for symbol spectra
 parameter (NSTEP=NSPS/4)              !Rough time-sync step size
 parameter (NHSYM=NMAX/NSTEP-3)        !Number of symbol spectra (1/4-sym steps)
 parameter (NDOWN=20)                  !Downsample factor
+parameter (MAXCAND=200)
