@@ -6,7 +6,52 @@ module packjt
 
   contains
 
-subroutine packcall(callsign,ncall,text)
+subroutine packbits(dbits,nsymd,m0,sym)
+
+ ! Pack 0s and 1s from dbits() into sym() with m0 bits per word.
+ ! NB: nsymd is the number of packed output words.
+
+   integer sym(:)
+   integer*1 dbits(:)
+
+   k=0
+   do i=1,nsymd
+      n=0
+      do j=1,m0
+         k=k+1
+         m=dbits(k)
+         n=ior(ishft(n,1),m)
+      enddo
+      sym(i)=n
+   enddo
+
+   return
+ end subroutine packbits
+
+ subroutine unpackbits(sym,nsymd,m0,dbits)
+
+ ! Unpack bits from sym() into dbits(), one bit per byte.
+ ! NB: nsymd is the number of input words, and m0 their length.
+ ! there will be m0*nsymd output bytes, each 0 or 1.
+
+   integer sym(:)
+   integer*1 dbits(:)
+
+   k=0
+   do i=1,nsymd
+      mask=ishft(1,m0-1)
+      do j=1,m0
+         k=k+1
+         dbits(k)=0
+         if(iand(mask,sym(i)).ne.0) dbits(k)=1
+         mask=ishft(mask,-1)
+      enddo
+   enddo
+
+   return
+ end subroutine unpackbits
+
+ subroutine packcall(callsign,ncall,text)
 
  ! Pack a valid callsign into a 28-bit integer.
 
@@ -489,12 +534,12 @@ subroutine packcall(callsign,ncall,text)
    return
  end subroutine packmsg
 
- subroutine unpackmsg(dat,msg,msgcall,msggrid)
+ subroutine unpackmsg(dat,msg)
 
    parameter (NBASE=37*36*10*27*27*27)
    parameter (NGBASE=180*180)
    integer dat(:)
-   character c1*12,c2*12,grid*4,msg*22,msgcall*6,msggrid*4,grid6*6,psfx*4,junk2*4
+   character c1*12,c2*12,grid*4,msg*22,grid6*6,psfx*4,junk2*4
    logical cqnnn
 
    cqnnn=.false.
@@ -526,15 +571,38 @@ subroutine packcall(callsign,ncall,text)
    endif
 
    call unpackcall(nc2,c2,junk1,junk2)
-   msgcall=c2(:6)
-   msggrid='    '
-   if(ng.lt.32400 .and. ng.ne.533) then
-      dlat=mod(ng,180)-90
-      dlong=(ng/180)*2 - 180 + 2
-      call deg2grid(dlong,dlat,grid6)
-      if(grid6(1:2).ne.'KA' .and. grid6(1:2).ne.'LA') msggrid=grid6(:4)
-   endif
    call unpackgrid(ng,grid)
+
+   if(iv2.gt.0) then
+ ! This is a JT65v2 message
+      do i=1,4
+         if(ichar(psfx(i:i)).eq.0) psfx(i:i)=' '
+      enddo
+
+      n1=len_trim(psfx)
+      n2=len_trim(c2)
+      if(iv2.eq.1) msg='CQ '//psfx(:n1)//'/'//c2(:n2)//' '//grid
+      if(iv2.eq.2) msg='QRZ '//psfx(:n1)//'/'//c2(:n2)//' '//grid
+      if(iv2.eq.3) msg='DE '//psfx(:n1)//'/'//c2(:n2)//' '//grid
+      if(iv2.eq.4) msg='CQ '//c2(:n2)//'/'//psfx(:n1)//' '//grid
+      if(iv2.eq.5) msg='QRZ '//c2(:n2)//'/'//psfx(:n1)//' '//grid
+      if(iv2.eq.6) msg='DE '//c2(:n2)//'/'//psfx(:n1)//' '//grid
+      if(iv2.eq.7) then
+         grid6=grid//'ma'
+         call grid2k(grid6,k)
+         if(k.ge.451 .and. k.le.900) then
+            call getpfx2(k,c2)
+            n2=len_trim(c2)
+            msg='DE '//c2(:n2)
+         else
+            msg='DE '//c2(:n2)//' '//grid
+         endif
+      endif
+      if(iv2.eq.8) msg=' '
+      go to 100
+   else
+
+   endif
 
    grid6=grid//'ma'
    call grid2k(grid6,k)
@@ -648,7 +716,7 @@ subroutine packcall(callsign,ncall,text)
 
    nc1=nc1a
    nc2=nc2a
-   nc3=iand(nc3a,32767)                    !Remove the "plain text" bit
+   nc3=iand(nc3a,32767)                      !Remove the "plain text" bit
    if(iand(nc1,1).ne.0) nc3=nc3+32768
    nc1=nc1/2
    if(iand(nc2,1).ne.0) nc3=nc3+65536
@@ -826,6 +894,32 @@ subroutine packcall(callsign,ncall,text)
    return
  end subroutine k2grid
 
+ subroutine grid2n(grid,n)
+   character*4 grid
+
+   i1=ichar(grid(1:1))-ichar('A')
+   i2=ichar(grid(3:3))-ichar('0')
+   i=10*i1 + i2
+   n=-i - 31
+
+   return
+ end subroutine grid2n
+
+ subroutine n2grid(n,grid)
+   character*4 grid
+
+   if(n.gt.-31 .or. n.lt.-70) stop 'Error in n2grid'
+   i=-(n+31)                           !NB: 0 <= i <= 39
+   i1=i/10
+   i2=mod(i,10)
+   grid(1:1)=char(ichar('A')+i1)
+   grid(2:2)='A'
+   grid(3:3)=char(ichar('0')+i2)
+   grid(4:4)='0'
+
+   return
+ end subroutine n2grid
+
  function nchar(c)
 
  ! Convert ascii number, letter, or space to 0-36 for callsign packing.
@@ -849,5 +943,91 @@ subroutine packcall(callsign,ncall,text)
 
    return
  end function nchar
+
+ subroutine pack50(n1,n2,dat)
+
+   integer*1 dat(:),i1
+
+   i1=iand(ishft(n1,-20),255)                !8 bits
+   dat(1)=i1
+   i1=iand(ishft(n1,-12),255)                 !8 bits
+   dat(2)=i1
+   i1=iand(ishft(n1, -4),255)                 !8 bits
+   dat(3)=i1
+   i1=16*iand(n1,15)+iand(ishft(n2,-18),15)   !4+4 bits
+   dat(4)=i1
+   i1=iand(ishft(n2,-10),255)                 !8 bits
+   dat(5)=i1
+   i1=iand(ishft(n2, -2),255)                 !8 bits
+   dat(6)=i1
+   i1=64*iand(n2,3)                           !2 bits
+   dat(7)=i1
+   dat(8)=0
+   dat(9)=0
+   dat(10)=0
+   dat(11)=0
+
+   return
+ end subroutine pack50
+
+subroutine packpfx(call1,n1,ng,nadd)
+
+  character*12 call1,call0
+  character*3 pfx
+  logical text
+
+  i1=index(call1,'/')
+  if(call1(i1+2:i1+2).eq.' ') then
+! Single-character add-on suffix (maybe also fourth suffix letter?)
+     call0=call1(:i1-1)
+     call packcall(call0,n1,text)
+     nadd=1
+     nc=ichar(call1(i1+1:i1+1))
+     if(nc.ge.48 .and. nc.le.57) then
+        n=nc-48
+     else if(nc.ge.65 .and. nc.le.90) then
+        n=nc-65+10
+     else
+        n=38
+     endif
+     nadd=1
+     ng=60000-32768+n
+  else if(call1(i1+3:i1+3).eq.' ') then
+! Two-character numerical suffix, /10 to /99
+     call0=call1(:i1-1)
+     call packcall(call0,n1,text)
+     nadd=1
+     n=10*(ichar(call1(i1+1:i1+1))-48) + ichar(call1(i1+2:i1+2)) - 48
+     nadd=1
+     ng=60000 + 26 + n
+  else
+! Prefix of 1 to 3 characters
+     pfx=call1(:i1-1)
+     if(pfx(3:3).eq.' ') pfx=' '//pfx(1:2)
+     if(pfx(3:3).eq.' ') pfx=' '//pfx(1:2)
+     call0=call1(i1+1:)
+     call packcall(call0,n1,text)
+
+     ng=0
+     do i=1,3
+        nc=ichar(pfx(i:i))
+        if(nc.ge.48 .and. nc.le.57) then
+           n=nc-48
+        else if(nc.ge.65 .and. nc.le.90) then
+           n=nc-65+10
+        else
+           n=36
+        endif
+        ng=37*ng + n
+     enddo
+     nadd=0
+     if(ng.ge.32768) then
+        ng=ng-32768
+        nadd=1
+     endif
+  endif
+
+  return
+end subroutine packpfx
 
 end module packjt

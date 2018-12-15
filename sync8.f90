@@ -17,7 +17,7 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
   integer indx(NFFT1)
   integer ii(1)
   integer icos7(0:6)
-  data icos7/2,5,6,0,4,1,3/                   !Costas 7x7 tone pattern
+  data icos7/3,1,4,0,6,5,2/                   !Costas 7x7 tone pattern
   equivalence (x,cx)
 
 ! Compute symbol spectra, stepping by NSTEP steps.
@@ -38,17 +38,14 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
      savg=savg + s(1:NFFT1,j)                 !Average spectrum
   enddo
   call baseline(savg,nfa,nfb,sbase)
-!  savg=savg/NHSYM
-!  do i=1,NFFT1
-!     write(51,3051) i*df,savg(i),db(savg(i))
-!3051 format(f10.3,e12.3,f12.3)
-!  enddo
 
   ia=max(1,nint(nfa/df))
   ib=nint(nfb/df)
   nssy=NSPS/NSTEP   ! # steps per symbol
   nfos=NFFT1/NSPS   ! # frequency bin oversampling factor
   jstrt=0.5/tstep
+  candidate0=0.
+  k=0
 
   do i=ia,ib
      do j=-JZ,+JZ
@@ -59,23 +56,22 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
         t0b=0.
         t0c=0.
         do n=0,6
-           k=j+jstrt+nssy*n
-           if(k.ge.1.and.k.le.NHSYM) then
-              ta=ta + s(i+nfos*icos7(n),k)
-              t0a=t0a + sum(s(i:i+nfos*6:nfos,k))
+           m=j+jstrt+nssy*n
+           if(m.ge.1.and.m.le.NHSYM) then
+              ta=ta + s(i+nfos*icos7(n),m)
+              t0a=t0a + sum(s(i:i+nfos*6:nfos,m))
            endif
-           tb=tb + s(i+nfos*icos7(n),k+nssy*36)
-           t0b=t0b + sum(s(i:i+nfos*6:nfos,k+nssy*36))
-           if(k+nssy*72.le.NHSYM) then
-              tc=tc + s(i+nfos*icos7(n),k+nssy*72)
-              t0c=t0c + sum(s(i:i+nfos*6:nfos,k+nssy*72))
+           tb=tb + s(i+nfos*icos7(n),m+nssy*36)
+           t0b=t0b + sum(s(i:i+nfos*6:nfos,m+nssy*36))
+           if(m+nssy*72.le.NHSYM) then
+              tc=tc + s(i+nfos*icos7(n),m+nssy*72)
+              t0c=t0c + sum(s(i:i+nfos*6:nfos,m+nssy*72))
            endif
         enddo
         t=ta+tb+tc
         t0=t0a+t0b+t0c
         t0=(t0-t)/6.0
         sync_abc=t/t0
-
         t=tb+tc
         t0=t0b+t0c
         t0=(t0-t)/6.0
@@ -90,8 +86,6 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
      j0=ii(1)
      jpeak(i)=j0
      red(i)=sync2d(i,j0)
-!     write(52,3052) i*df,red(i),db(red(i))
-!3052 format(3f12.3)
   enddo
   iz=ib-ia+1
   call indexx(red(ia:ib),iz,indx)
@@ -101,9 +95,7 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
   base=red(ibase)
   red=red/base
 
-  candidate0=0.
-  k=0
-  do i=1,MAXCAND
+  do i=1,min(MAXCAND,iz)
      n=ia + indx(iz+1-i) - 1
      if(red(n).lt.syncmin.or.isnan(red(n)).or.k.eq.MAXCAND) exit
      k=k+1
@@ -124,9 +116,6 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
               if(candidate0(3,i).lt.candidate0(3,j)) candidate0(3,i)=0.
            endif
         enddo
-!        write(*,3001) i,candidate0(1,i-1),candidate0(1,i),candidate0(3,i-1),  &
-!             candidate0(3,i)
-!3001    format(i2,4f8.1)
      endif
   enddo
 
@@ -143,9 +132,8 @@ subroutine sync8(dd,nfa,nfb,syncmin,nfqso,s,candidate,ncand,sbase)
      j=indx(i)
 !     if( candidate0(3,j) .ge. syncmin .and. candidate0(2,j).ge.-1.5 ) then
      if( candidate0(3,j) .ge. syncmin ) then
+       candidate(2:3,k)=candidate0(2:3,j)
        candidate(1,k)=abs(candidate0(1,j))
-       candidate(2,k)=candidate0(2,j)
-       candidate(3,k)=candidate0(3,j)
        k=k+1
      endif
   enddo

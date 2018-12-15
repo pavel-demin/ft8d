@@ -1,35 +1,33 @@
-subroutine genft8(msg,i3bit,itone)
+subroutine genft8(msg,i3,n3,msgsent,msgbits,itone)
 
 ! Encode an FT8 message, producing array itone().
 
-  use crc
-  use packjt
+  use packjt77
   include 'ft8_params.f90'
-  character*22 msg
-  character*87 cbits
-  integer*4 i4Msg6BitWords(12)                !72-bit message as 6-bit words
-  integer*1 msgbits(KK),codeword(3*ND)
-  integer*1, target:: i1Msg8BitBytes(11)
-  integer itone(NN)
+  character msg*37,msgsent*37,msgcall*13,msggrid*4
+  character*77 c77
+  integer*1 msgbits(77),codeword(174)
+  integer itone(79)
   integer icos7(0:6)
-  data icos7/2,5,6,0,4,1,3/                   !Costas 7x7 tone pattern
+  integer graymap(0:7)
+  logical unpk77_success
+  data icos7/3,1,4,0,6,5,2/                   !Costas 7x7 tone pattern
+  data graymap/0,1,3,2,5,6,4,7/
 
-  call packmsg(msg,i4Msg6BitWords,itype) !Pack into 12 6-bit bytes
+  i3=-1
+  n3=-1
+  call pack77(msg,i3,n3,c77)
+  call unpack77(c77,msgsent,msgcall,msggrid,unpk77_success)
+  read(c77,'(77i1)',err=1) msgbits
+  if(unpk77_success) go to 2
+1 msgbits=0
+  itone=0
+  msgsent='*** bad message ***                  '
+  go to 900
 
-  write(cbits,1000) i4Msg6BitWords,32*i3bit
-1000 format(12b6.6,b8.8)
-  read(cbits,1001) i1Msg8BitBytes(1:10)
-1001 format(10b8)
-  i1Msg8BitBytes(10)=iand(i1Msg8BitBytes(10),128+64+32)
-  i1Msg8BitBytes(11)=0
-  icrc12=crc12(c_loc(i1Msg8BitBytes),11)
+entry get_tones_from_77bits(msgbits,itone)
 
-  write(cbits,1003) i4Msg6BitWords,i3bit,icrc12
-1003 format(12b6.6,b3.3,b12.12)
-  read(cbits,1004) msgbits
-1004 format(87i1)
-
-  call encode174(msgbits,codeword)      !Encode the test message
+2  call encode174_91(msgbits,codeword)      !Encode the test message
 
 ! Message structure: S7 D29 S7 D29 S7
   itone(1:7)=icos7
@@ -40,8 +38,9 @@ subroutine genft8(msg,i3bit,itone)
      i=3*j -2
      k=k+1
      if(j.eq.30) k=k+7
-     itone(k)=codeword(i)*4 + codeword(i+1)*2 + codeword(i+2)
+     indx=codeword(i)*4 + codeword(i+1)*2 + codeword(i+2)
+     itone(k)=graymap(indx)
   enddo
 
-  return
+900 return
 end subroutine genft8

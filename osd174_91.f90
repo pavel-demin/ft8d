@@ -1,9 +1,8 @@
-subroutine osd174(llr,apmask,ndeep,decoded,cw,nhardmin,dmin)
+subroutine osd174_91(llr,apmask,ndeep,message77,cw,nhardmin,dmin)
 !
-! An ordered-statistics decoder for the (174,87) code.
+! An ordered-statistics decoder for the (174,91) code.
 !
-include "ldpc_174_87_params.f90"
-
+integer, parameter:: N=174, K=91, M=N-K
 integer*1 apmask(N),apmaskr(N)
 integer*1 gen(K,N)
 integer*1 genmrb(K,N),g2(N,K)
@@ -12,8 +11,12 @@ integer*1 r2pat(N-K)
 integer indices(N),nxor(N)
 integer*1 cw(N),ce(N),c0(N),hdec(N)
 integer*1 decoded(K)
+integer*1 message77(77)
 integer indx(N)
 real llr(N),rx(N),absrx(N)
+
+include "ldpc_174_91_c_generator.f90"
+
 logical first,reset
 data first/.true./
 save first,gen
@@ -21,23 +24,24 @@ save first,gen
 if( first ) then ! fill the generator matrix
   gen=0
   do i=1,M
-    do j=1,22
+    do j=1,23
       read(g(i)(j:j),"(Z1)") istr
-        do jj=1, 4
-          irow=(j-1)*4+jj
-          if( btest(istr,4-jj) ) gen(irow,i)=1
-        enddo
+      ibmax=4
+      if(j.eq.23) ibmax=3
+      do jj=1, ibmax
+        irow=(j-1)*4+jj
+        if( btest(istr,4-jj) ) gen(irow,K+i)=1
+      enddo
     enddo
   enddo
   do irow=1,K
-    gen(irow,M+irow)=1
+    gen(irow,irow)=1
   enddo
 first=.false.
 endif
 
-! Re-order received vector to place systematic msg bits at the end.
-rx=llr(colorder+1)
-apmaskr=apmask(colorder+1)
+rx=llr
+apmaskr=apmask
 
 ! Hard decisions on the received word.
 hdec=0
@@ -92,7 +96,7 @@ absrx=absrx(indices)
 rx=rx(indices)
 apmaskr=apmaskr(indices)
 
-call mrbencode(m0,c0,g2,N,K)
+call mrbencode91(m0,c0,g2,N,K)
 nxor=ieor(c0,hdec)
 nhardmin=sum(nxor)
 dmin=sum(nxor*absrx)
@@ -155,7 +159,7 @@ do iorder=1,nord
          ntotal=ntotal+1
          me=ieor(m0,mi)
          if(n1.eq.iflag) then
-            call mrbencode(me,ce,g2,N,K)
+            call mrbencode91(me,ce,g2,N,K)
             e2sub=ieor(ce(K+1:N),hdec(K+1:N))
             e2=e2sub
             nd1Kpt=sum(e2sub(1:nt))+1
@@ -165,7 +169,7 @@ do iorder=1,nord
             nd1Kpt=sum(e2(1:nt))+2
          endif
          if(nd1Kpt .le. ntheta) then
-            call mrbencode(me,ce,g2,N,K)
+            call mrbencode91(me,ce,g2,N,K)
             nxor=ieor(ce,hdec)
             if(n1.eq.iflag) then
                dd=d1+sum(e2sub*absrx(K+1:N))
@@ -184,7 +188,7 @@ do iorder=1,nord
       enddo
 ! Get the next test error pattern, iflag will go negative
 ! when the last pattern with weight iorder has been generated.
-      call nextpat(misub,k,iorder,iflag)
+      call nextpat91(misub,k,iorder,iflag)
    enddo
 enddo
 
@@ -195,7 +199,7 @@ if(npre2.eq.1) then
       do i2=i1-1,1,-1
          ntotal=ntotal+1
          mi(1:ntau)=ieor(g2(K+1:K+ntau,i1),g2(K+1:K+ntau,i2))
-         call boxit(reset,mi(1:ntau),ntau,ntotal,i1,i2)
+         call boxit91(reset,mi(1:ntau),ntau,ntotal,i1,i2)
       enddo
    enddo
 
@@ -208,7 +212,7 @@ if(npre2.eq.1) then
    iflag=K-nord+1
    do while(iflag .ge.0)
       me=ieor(m0,misub)
-      call mrbencode(me,ce,g2,N,K)
+      call mrbencode91(me,ce,g2,N,K)
       e2sub=ieor(ce(K+1:N),hdec(K+1:N))
       do i2=0,ntau
          ntotal2=ntotal2+1
@@ -216,7 +220,7 @@ if(npre2.eq.1) then
          if(i2.gt.0) ui(i2)=1
          r2pat=ieor(e2sub,ui)
 778      continue
-            call fetchit(reset,r2pat(1:ntau),ntau,in1,in2)
+            call fetchit91(reset,r2pat(1:ntau),ntau,in1,in2)
             if(in1.gt.0.and.in2.gt.0) then
                ncount2=ncount2+1
                mi=misub
@@ -224,7 +228,7 @@ if(npre2.eq.1) then
                mi(in2)=1
                if(sum(mi).lt.nord+npre1+npre2.or.any(iand(apmaskr(1:K),mi).eq.1)) cycle
                me=ieor(m0,mi)
-               call mrbencode(me,ce,g2,N,K)
+               call mrbencode91(me,ce,g2,N,K)
                nxor=ieor(ce,hdec)
                dd=sum(nxor*absrx)
                if( dd .lt. dmin ) then
@@ -235,20 +239,23 @@ if(npre2.eq.1) then
                goto 778
              endif
       enddo
-      call nextpat(misub,K,nord,iflag)
+      call nextpat91(misub,K,nord,iflag)
    enddo
 endif
 
 998 continue
-! Re-order the codeword to place message bits at the end.
+! Re-order the codeword to [message bits][parity bits] format.
 cw(indices)=cw
 hdec(indices)=hdec
-decoded=cw(M+1:N)
-cw(colorder+1)=cw ! put the codeword back into received-word order
-return
-end subroutine osd174
+decoded=cw(1:K)
+call chkcrc14a(decoded,nbadcrc)
+message77=decoded(1:77)
+if(nbadcrc.eq.1) nhardmin=-nhardmin
 
-subroutine mrbencode(me,codeword,g2,N,K)
+return
+end subroutine osd174_91
+
+subroutine mrbencode91(me,codeword,g2,N,K)
 integer*1 me(K),codeword(N),g2(N,K)
 ! fast encoding for low-weight test patterns
   codeword=0
@@ -258,9 +265,9 @@ integer*1 me(K),codeword(N),g2(N,K)
     endif
   enddo
 return
-end subroutine mrbencode
+end subroutine mrbencode91
 
-subroutine nextpat(mi,k,iorder,iflag)
+subroutine nextpat91(mi,k,iorder,iflag)
   integer*1 mi(k),ms(k)
 ! generate the next test error pattern
   ind=-1
@@ -287,11 +294,11 @@ subroutine nextpat(mi,k,iorder,iflag)
     endif
   enddo
   return
-end subroutine nextpat
+end subroutine nextpat91
 
-subroutine boxit(reset,e2,ntau,npindex,i1,i2)
+subroutine boxit91(reset,e2,ntau,npindex,i1,i2)
   integer*1 e2(1:ntau)
-  integer   indexes(4000,2),fp(0:525000),np(4000)
+  integer   indexes(5000,2),fp(0:525000),np(5000)
   logical reset
   common/boxes/indexes,fp,np
 
@@ -323,10 +330,10 @@ subroutine boxit(reset,e2,ntau,npindex,i1,i2)
      np(ip)=npindex
   endif
   return
-end subroutine boxit
+end subroutine boxit91
 
-subroutine fetchit(reset,e2,ntau,i1,i2)
-  integer   indexes(4000,2),fp(0:525000),np(4000)
+subroutine fetchit91(reset,e2,ntau,i1,i2)
+  integer   indexes(5000,2),fp(0:525000),np(5000)
   integer   lastpat
   integer*1 e2(ntau)
   logical reset
@@ -361,5 +368,5 @@ subroutine fetchit(reset,e2,ntau,i1,i2)
   endif
   lastpat=ipat
   return
-end subroutine fetchit
+end subroutine fetchit91
 
