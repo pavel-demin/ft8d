@@ -71,7 +71,7 @@ program ft8d
         nsnr=nint(xsnr)
         xdt=xdt-0.5
         hd=nharderrors+dmin
-        if(nbadcrc.eq.0.and.msgcall(1:1).ne.'<') then
+        if(nbadcrc.eq.0.and.msgcall(1:1).ne.' '.and.msgcall(1:1).ne.'<') then
           ldupe=.false.
           do id=1,ndecodes
             if(msg37.eq.allmessages(id).and.nsnr.le.allsnrs(id)) ldupe=.true.
