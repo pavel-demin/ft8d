@@ -5,14 +5,14 @@ program ft8d
   include 'ft8_params.f90'
   character infile*80,msg37*37,date*6,time*4
   character msgcall*13,msggrid*4
-  character*37 allmessages(100)
+  character*37 allmessages(MAXCAND)
   real s(NFFT1,NHSYM)
   real sbase(NFFT1)
   real candidate(3,MAXCAND)
   real*8 dialfreq
   complex dd(NMAX,4)
   logical newdat,lft8apon,lsubtract,ldupe
-  integer allsnrs(100)
+  integer allsnrs(MAXCAND)
   integer apsym(58)
 
   apsym=0
