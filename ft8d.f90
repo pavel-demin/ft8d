@@ -46,7 +46,8 @@ program ft8d
     lft8apon=.false.
     ndepth=1
     if(ndepth.eq.1) npass=1
-    if(ndepth.ge.2) npass=3
+    if(ndepth.eq.2) npass=3
+    if(ndepth.ge.3) npass=5
     do ipass=1,npass
       newdat=.true.
       syncmin=1.5
