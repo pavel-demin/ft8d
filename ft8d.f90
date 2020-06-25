@@ -81,11 +81,10 @@ program ft8d
           do id=1,ndecodes
             if(msg37.eq.allmessages(id).and.nsnr.le.allsnrs(id)) ldupe=.true.
           enddo
-          if(.not.ldupe) then
-            ndecodes=ndecodes+1
-            allmessages(ndecodes)=msg37
-            allsnrs(ndecodes)=nsnr
-          endif
+          if(ldupe) cycle
+          ndecodes=ndecodes+1
+          allmessages(ndecodes)=msg37
+          allsnrs(ndecodes)=nsnr
           write(*,1004) date,time,15*(ipart-1),min(sync,999.0),nint(xsnr), &
               xdt,nint(f1-2000+dialfreq),msgcall,msggrid
 1004      format(a6,1x,a4,i2.2,f6.1,i4,f6.2,i9,1x,a13,1x,a4)
