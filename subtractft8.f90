@@ -9,13 +9,13 @@ subroutine subtractft8(dd,itone,f0,dt)
 
   parameter (NMAX=15*4000,NFRAME=640*79)
   parameter (NFFT=NMAX,NFILT=1400)
-  real*4 window(-NFILT/2:NFILT/2)
+  real*4 window(-NFILT/2:NFILT/2),xjunk
   complex dd(NMAX)
   complex cref,camp,cfilt,cw
   integer itone(79)
   logical first
   data first/.true./
-  common/heap8/cref(NFRAME),camp(NMAX),cfilt(NMAX),cw(NMAX)
+  common/heap8/cref(NFRAME),camp(NMAX),cfilt(NMAX),cw(NMAX),xjunk(NFRAME)
   save first
 
   if(f0.lt.2000.0) then
@@ -24,7 +24,7 @@ subroutine subtractft8(dd,itone,f0,dt)
     f=f0-2000.0
   endif
   nstart=dt*4000+1
-  call genft8refsig(itone,cref,f)
+  call gen_ft8wave(itone,79,640,2.0,4000.0,f,cref,xjunk,1,NFRAME)
   camp=0.
   do i=1,nframe
     id=nstart-1+i

@@ -13,7 +13,11 @@ program ft8d
   complex dd(NMAX,4)
   logical newdat,lft8apon,lsubtract,ldupe
   integer allsnrs(100)
-  integer apsym(KK)
+  integer apsym(58)
+
+  apsym=0
+  apsym(1)=99
+  apsym(30)=99
 
   nargs=iargc()
   if(nargs.ne.1) then
