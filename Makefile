@@ -12,8 +12,8 @@ FC = gfortran
 LD = gfortran
 RM = rm -f
 
-CFLAGS = -Wall -O3 -funroll-loops
-FFLAGS = -Wall -O3 -funroll-loops
+CFLAGS = -Wall -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mfpu=neon -mfloat-abi=hard -ffast-math -fsingle-precision-constant -mvectorize-with-neon-quad
+FFLAGS = -Wall -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mfpu=neon -mfloat-abi=hard -ffast-math -fsingle-precision-constant -mvectorize-with-neon-quad
 
 all: $(TARGET)
 
