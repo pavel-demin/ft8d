@@ -14,7 +14,6 @@ RM = rm -f
 
 CFLAGS = -Wall -O3 -funroll-loops
 FFLAGS = -Wall -O3 -funroll-loops
-LDFLAGS = -lfftw3f
 
 all: $(TARGET)
 
@@ -24,7 +23,7 @@ all: $(TARGET)
 	${FC} -c ${FFLAGS} $< -o $@
 
 $(TARGET): $(OBJECTS)
-	$(LD) $(OBJECTS) $(LDFLAGS) -o $@
+	$(LD) $(OBJECTS) -o $@
 
 clean:
 	$(RM) *.o *.mod $(TARGET)
