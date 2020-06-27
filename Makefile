@@ -12,8 +12,8 @@ FC = gfortran
 LD = gfortran
 RM = rm -f
 
-CFLAGS = -O3 -Wall
-FFLAGS = -O3 -Wall -funroll-loops -fno-second-underscore
+CFLAGS = -Wall -O3 -funroll-loops
+FFLAGS = -Wall -O3 -funroll-loops
 LDFLAGS = -lfftw3f
 
 all: $(TARGET)
