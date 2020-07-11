@@ -8,6 +8,10 @@ A brief description of the FT8 protocol can be found at:
 
   http://physics.princeton.edu/pulsar/k1jt/ft8.txt
 
+This FT8 decoder is mainly used with the FT8 application for the Red Pitaya board:
+
+  http://pavel-demin.github.io/red-pitaya-notes/sdr-transceiver-ft8
+
 Changes from the original sources:
   - ft8d.f90 is updated and working
   - crc14.cpp is replaced with crc14.c
