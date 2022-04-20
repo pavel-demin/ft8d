@@ -168,7 +168,7 @@ extern "C" {
   void pffft_aligned_free(void *);
 
   /* return 4 or 1 wether support SSE/Altivec instructions was enable when building pffft.c */
-  int pffft_simd_size();
+  int pffft_simd_size(void);
 
 #ifdef __cplusplus
 }
